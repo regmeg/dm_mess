@@ -136,8 +136,8 @@ batch_size = int(total_len/cfg['num_batches'])
 n_features = X_train.shape[1]
 n_hidden_1 = int(n_features*cfg['lay_1']) # 1st layer number of features
 n_hidden_2 = int(n_features*cfg['lay_2']) # 2nd layer number of features
-#n_hidden_3 = int(n_features*cfg['lay_3'])
-#n_hidden_4 = int(n_features*cfg['lay_4'])
+n_hidden_3 = int(n_features*cfg['lay_3']) # 2nd layer number of features
+n_hidden_4 = int(n_features*cfg['lay_4']) # 2nd layer number of features
 
 print(X_train)
 print(X_test)
@@ -161,49 +161,71 @@ train_pl = tf.placeholder(dtype=tf.bool)
 
 # Create model
 def multilayer_perceptron(x, params, training):
-    # Hidden layer with RELU activation
-    layer_1 = tf.add(tf.matmul(x, params['h1']), params['b1'])
-    layer_1 = tf.nn.relu(layer_1)
-    layer_1 = tf.layers.dropout(layer_1, cfg['drop_rate'], training = training)
-
-
-    # Hidden layer with RELU activation
-    layer_2 = tf.add(tf.matmul(layer_1, params['h2']), params['b2'])
-    layer_2 = tf.nn.relu(layer_2)
-    layer_2 = tf.layers.dropout(layer_2, cfg['drop_rate'], training = training)
-
-    """
-    # Hidden layer with RELU activation
-    layer_3 = tf.add(tf.matmul(layer_2, params['h3']), params['b3'])
-    layer_3 = tf.nn.relu(layer_3)
-    layer_3 = tf.layers.dropout(layer_3, cfg['drop_rate'], training = training)
-
-    # Hidden layer with RELU activation
-    layer_4 = tf.add(tf.matmul(layer_3, params['h4']), params['b4'])
-    layer_4 = tf.nn.relu(layer_4)
-    layer_4 = tf.layers.dropout(layer_4, cfg['drop_rate'], training = training)
-    """
     
-    # Output layer with linear activation
-    out_layer = tf.matmul(layer_2, params['hout']) + params['bout']
+    if True:
+        # Hidden layer with RELU activation
+        layer_1 = tf.add(tf.matmul(x, params['h1']), params['b1'])
+        layer_1 = tf.nn.relu(layer_1)
+        layer_1 = tf.layers.dropout(layer_1, cfg['drop_rate'], training = training)
+        last_layer = layer_1
+        
+    if n_hidden_2 > 0:
+        # Hidden layer with RELU activation
+        layer_2 = tf.add(tf.matmul(layer_1, params['h2']), params['b2'])
+        layer_2 = tf.nn.relu(layer_2)
+        layer_2 = tf.layers.dropout(layer_2, cfg['drop_rate'], training = training)
+        last_layer = layer_2
+        
+    if n_hidden_3 > 0 and n_hidden_2 > 0:
+        # Hidden layer with RELU activation
+        layer_3 = tf.add(tf.matmul(layer_2, params['h3']), params['b3'])
+        layer_3 = tf.nn.relu(layer_3)
+        layer_3 = tf.layers.dropout(layer_3, cfg['drop_rate'], training = training)
+        last_layer = layer_3
+        
+    if n_hidden_4 > 0 and n_hidden_3 > 0 and n_hidden_2 > 0:
+        # Hidden layer with RELU activation
+        layer_4 = tf.add(tf.matmul(layer_3, params['h4']), params['b4'])
+        layer_4 = tf.nn.relu(layer_4)
+        layer_4 = tf.layers.dropout(layer_4, cfg['drop_rate'], training = training)
+        last_layer = layer_4
+    
+    if True:
+        # Output layer with linear activation
+        out_layer = tf.matmul(last_layer, params['hout']) + params['bout']
+
     return out_layer
 
 
 #set seed
 tf.set_random_seed(cfg['seed'])
 # Store layers weight & bias
-params = {
-    'h1': tf.get_variable("h1", shape=[n_features, n_hidden_1], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf'])),
-    'h2': tf.get_variable("h2", shape=[n_hidden_1, n_hidden_2], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf'])),
-    #'h3': tf.get_variable("h3", shape=[n_hidden_2, n_hidden_3], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf'])),
-    #'h4': tf.get_variable("h4", shape=[n_hidden_3, n_hidden_4], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf'])),
-    'hout': tf.get_variable("hout", shape=[n_hidden_2, 1], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf'])),
-    'b1': tf.Variable(tf.random_normal([n_hidden_1], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf']),
-    'b2': tf.Variable(tf.random_normal([n_hidden_2], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf']),
-    #'b3': tf.Variable(tf.random_normal([n_hidden_3], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf']),
-    #'b4': tf.Variable(tf.random_normal([n_hidden_4], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf']),
-    'bout': tf.Variable(tf.random_normal([1], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf'])
-}
+params = {}
+
+if True:
+    params['h1'] = tf.get_variable("h1", shape=[n_features, n_hidden_1], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf']))
+    params['b1'] = tf.Variable(tf.random_normal([n_hidden_1], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf'])
+    last_hidden = n_hidden_1
+    
+if n_hidden_2 > 0:
+    params['h2'] = tf.get_variable("h2", shape=[n_hidden_1, n_hidden_2], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf']))
+    params['b2'] = tf.Variable(tf.random_normal([n_hidden_2], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf'])
+    last_hidden = n_hidden_2
+    
+if n_hidden_3 > 0 and n_hidden_2 > 0:
+    params['h3'] = tf.get_variable("h3", shape=[n_hidden_2, n_hidden_3], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf']))
+    params['b3'] = tf.Variable(tf.random_normal([n_hidden_3], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf'])
+    last_hidden = n_hidden_3
+    
+if n_hidden_4 > 0 and n_hidden_3 > 0 and n_hidden_2 > 0:
+    params['h4'] = tf.get_variable("h4", shape=[n_hidden_3, n_hidden_4], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf']))
+    params['b4'] = tf.Variable(tf.random_normal([n_hidden_4], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf'])
+    last_hidden = n_hidden_4
+    
+if True:
+    params['hout'] = tf.get_variable("hout", shape=[last_hidden, 1], dtype=cfg['dtype_tf'], initializer=tf.contrib.layers.variance_scaling_initializer(factor=2.0,  mode='FAN_IN', uniform=False,  seed=None, dtype=cfg['dtype_tf']))
+    params['bout'] = tf.Variable(tf.random_normal([1], 0, 0.1, dtype=cfg['dtype_tf']), dtype=cfg['dtype_tf']) 
+
 
 model_vars = {
     'global_step' : tf.Variable(0, name='global_step', trainable=False, dtype=cfg['dtype_tf'])
@@ -246,6 +268,7 @@ with tf.Session() as sess:
     global_train_cost = np.inf
     global_test_cost = np.inf
     global_r2_cost = 0.0
+    global_r2_cost_train = 0.0
     for epoch in range(cfg['epochs']):
         test = False
         avg_cost = 0.
@@ -278,6 +301,10 @@ with tf.Session() as sess:
             r2_local = r2_score(np.transpose(Y_test), yp_test)
             if test_cost < global_test_cost: global_test_cost = test_cost
             if r2_local > global_r2_cost: global_r2_cost = r2_local
+                
+            test_cost_train, yp_train = sess.run([cost, ypred], feed_dict={xbatch: X_train, ybatch: Y_train, train_pl: False})
+            r2_local_train = r2_score(np.transpose(Y_train), yp_train)
+            if r2_local_train > global_r2_cost_train: global_r2_cost_train = r2_local_train
             #print ("Testing cost=", test_cost)
             #print ("r2_score=", r2_local)
             saver.save(sess, './summaries_movies/' + cfg['dst'] + '/model/',global_step=epoch)
@@ -286,7 +313,8 @@ with tf.Session() as sess:
         print ("Epoch:", '%04d' % (epoch+1), "Train cost=", "{:.9f}".format(avg_cost))
         print ("Lowest          Train cost=",  "{:.9f}".format(global_train_cost))
         print ("Lowest          Test  cost=",  "{:.9f}".format(global_test_cost))
-        print ("Highest           r2_score=",  "{:.9f}".format(global_r2_cost))
+        print ("Highest        r2_score_train=",  "{:.9f}".format(global_r2_cost_train))
+        print ("Highest         r2_score_test=",  "{:.9f}".format(global_r2_cost))
         print ("[*]----------------------------")
         for i in range(3):
             ind = randint(0, batch_size-1)

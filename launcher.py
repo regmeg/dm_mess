@@ -34,12 +34,13 @@ def gen_cmd(cfg_dict, seed):
 
 
 params=OrderedDict()
-params['num_batches'] = [2,3]
+params['num_batches'] = [2]
 params['learning_rate'] = [0.001]
-params['sel_col'] = [True]
-params['lay'] = [[5,3], [2,1]]
-params['stochastic'] = [True, False]
-params['add_noise'] = [True, False]
+params['sel_col'] = [False]
+params['lay'] = [[8], [5,3], [5,3,2]]
+params['stochastic'] = [True]
+params['drop_rate'] = [0.35, 0.5]
+params['add_noise'] = [False]
 params['norm'] = [True]
 
 

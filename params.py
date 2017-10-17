@@ -16,8 +16,10 @@ tf.flags.DEFINE_float("test_ratio", 0.3, "test_ratio")
 tf.flags.DEFINE_integer("test_cycle", 100, "test_cycle")
 tf.flags.DEFINE_float("learning_rate", 0.001, "learning_rate")
 tf.flags.DEFINE_boolean("sel_col", True, "whether sel confined columns")
-tf.flags.DEFINE_integer("lay_1", 5, "lay_1")
-tf.flags.DEFINE_integer("lay_2", 3, "lay_2")
+tf.flags.DEFINE_integer("lay_1", 1, "lay_1")
+tf.flags.DEFINE_integer("lay_2", 0, "lay_2")
+tf.flags.DEFINE_integer("lay_3", 0, "lay_3")
+tf.flags.DEFINE_integer("lay_4", 0, "lay_4")
 tf.flags.DEFINE_float("drop_rate", 0.35, "drop_rate")
 tf.flags.DEFINE_boolean("stochastic", True, "whether to shuffle samples")
 tf.flags.DEFINE_boolean("add_noise", False, "whether to add gradient noise")
@@ -43,6 +45,8 @@ def get_cfg():
         sel_col = FLAGS.sel_col,
         lay_1 = FLAGS.lay_1,
         lay_2 = FLAGS.lay_2,
+        lay_3 = FLAGS.lay_3,
+        lay_4= FLAGS.lay_4,
         drop_rate = FLAGS.drop_rate,
         stochastic = FLAGS.stochastic,
         add_noise = FLAGS.add_noise,
